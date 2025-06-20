@@ -1,17 +1,27 @@
-<?
+<?php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\BookController as AdminBookController;
 use App\Http\Controllers\Student\BookController as StudentBookController;
 use App\Http\Controllers\Student\BorrowingController as StudentBorrowingController;
 
+
 // 1. Default root redirect
 Route::get('/', function () {
+    if (auth()->check()) {
+        if (auth()->user()->isAdmin()) {
+            return redirect()->route('admin.dashboard');
+        } elseif (auth()->user()->isStudent()) {
+            return redirect()->route('student.dashboard');
+        }
+        // Jika tidak punya role, logout
+        return redirect()->route('logout');
+    }
     return redirect('/login');
 });
 
 // 2. Routes untuk login/logout (tanpa middleware)
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

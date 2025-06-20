@@ -19,8 +19,13 @@ class StudentMiddleware
             return $next($request);
         }
 
-        return redirect()->route('admin.dashboard')
-            ->with('error', 'Anda tidak memiliki akses ke halaman mahasiswa.');
+        if (Auth::user()->isAdmin()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Anda tidak memiliki akses ke halaman mahasiswa.');
+        }
+
+        // Jika user tidak punya role, logout
+        return redirect()->route('logout');
     }
 }
 

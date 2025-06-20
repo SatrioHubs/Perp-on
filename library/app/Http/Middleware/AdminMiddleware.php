@@ -18,8 +18,12 @@ class AdminMiddleware
             return $next($request);
         }
 
-        // Pastikan ini tidak memicu loop
-        return redirect()->route('student.dashboard')
-            ->with('error', 'Anda tidak memiliki akses ke halaman admin.');
+        if (Auth::user()->isStudent()) {
+            return redirect()->route('student.dashboard')
+                ->with('error', 'Anda tidak memiliki akses ke halaman admin.');
+        }
+
+        // Jika user tidak punya role, logout
+        return redirect()->route('logout');
     }
 }
